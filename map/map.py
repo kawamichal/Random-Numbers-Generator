@@ -1,5 +1,7 @@
 import json
+import multiprocessing
 import random
+
 
 
 def lambda_handler(event, context=None):
@@ -49,6 +51,31 @@ def lambda_handler(event, context=None):
         }
 
 
+def single_worker_generate_random_numbers(worker_id, worker_sims, result_queue, random_seed):
+    """
+    Generate random numbers for a single worker.
+
+    :param worker_id: Unique identifier for the worker.
+    :type worker_id: int
+
+    :param worker_sims: Number of random numbers to generate for the worker.
+    :type worker_sims: int
+
+    :param result_queue: A multiprocessing queue to store the generated random numbers.
+    :type result_queue: multiprocessing.Queue
+
+    :param random_seed: The random seed for deterministic behavior.
+    :type random_seed: int
+
+    :return: None
+    """
+    # Set the random seed for deterministic behavior
+    random.seed(random_seed + worker_id)
+    worker_numbers = [(worker_id, random.random()) for _ in range(worker_sims)]
+    # Put the results in queue
+    result_queue.put(worker_numbers)
+
+
 def generate_random_numbers(n_sims, random_seed, n_workers):
     """
     Generate random numbers distributed among workers.
@@ -71,11 +98,15 @@ def generate_random_numbers(n_sims, random_seed, n_workers):
     by the number of workers, so some workers may get an additional simulation (remainder)
     to ensure all simulations are utilized.
     """
-    random.seed(random_seed)
+    # Divide the task among worker processes
     sims_per_worker = n_sims // n_workers
     remainder = n_sims % n_workers
 
-    random_numbers = []
+    # Create a multiprocessing queue to collect results from workers
+    result_queue = multiprocessing.Queue()
+
+    # Create a list to hold references to worker processes
+    processes = []
 
     # simulating the workers
     for worker_id in range(n_workers):
@@ -86,8 +117,18 @@ def generate_random_numbers(n_sims, random_seed, n_workers):
             worker_sims += 1
             remainder -= 1
 
-        # generating numbers for each worker
-        worker_numbers = [random.random() for _ in range(worker_sims)]
-        random_numbers.extend([(worker_id, num) for num in worker_numbers])
+        process = multiprocessing.Process(target=single_worker_generate_random_numbers,
+                                          args=(worker_id, worker_sims, result_queue, random_seed))
+        processes.append(process)
+        process.start()
+
+    # Wait for all processes to finish
+    for process in processes:
+        process.join()
+
+    random_numbers = []
+    for _ in range(n_workers):
+        result = result_queue.get()
+        random_numbers.extend(result)
 
     return random_numbers

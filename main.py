@@ -8,7 +8,7 @@ example_input_data = json.dumps(
     {
         "title": "Random Number Generator",
         "n_workers": 4,
-        "random_seed": 0.123,
+        "random_seed": 2,
         "n_sims": 9,
         "threshold": 0.6
     }
