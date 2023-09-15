@@ -51,5 +51,5 @@ def lambda_handler(event, context=None):
     except Exception:
         return {
             'statusCode': 400,
-            'body': ["The provided data is not in a JSON"]
+            'body': ["The provided data is not in a JSON format."]
         }
