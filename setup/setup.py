@@ -20,7 +20,7 @@ def lambda_handler(event, context=None):
     Handle an AWS Lambda function event by processing input JSON data.
 
     :param event: Event object that holds the input_data.
-    :type event: dict
+    :type event: str
 
     :param context: Object that provides methods and properties that offer information about the invocation,
                     function, and execution environment. (Optional, defaults to None)

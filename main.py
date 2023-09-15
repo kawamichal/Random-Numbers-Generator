@@ -9,7 +9,7 @@ example_input_data = json.dumps(
         "title": "Random Number Generator",
         "n_workers": 4,
         "random_seed": 2,
-        "n_sims": 9,
+        "n_sims": 10,
         "threshold": 0.6
     }
 )
@@ -30,19 +30,16 @@ if __name__ == "__main__":
         else:
             input_payload = answer
 
-        # Step 1: Setup Lambda
         setup_response = invoke_lambda(setup_lambda_name, input_payload)
         print("Step 1: Setup Response")
         print(setup_response)
 
         if setup_response["statusCode"] == 200:
-            # Step 2: Map Lambda
             map_response = invoke_lambda(map_lambda_name, setup_response['body'])
             print("Step 2: Map Response")
             print(map_response)
 
             if map_response["statusCode"] == 200:
-                # Step 3: Reduce Lambda
                 reduce_response = invoke_lambda(reduce_lambda_name, map_response['body'])
                 print("Step 3: Reduce Response")
                 print(reduce_response)

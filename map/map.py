@@ -9,7 +9,7 @@ def lambda_handler(event, context=None):
     Handle an AWS Lambda function event by generating random numbers based on input parameters.
 
     :param event: Event object that holds the input_data as a JSON payload.
-    :type event: dict
+    :type event: str
 
     :param context: Object that provides methods and properties that offer information about the invocation,
                     function, and execution environment. (Optional, defaults to None)
@@ -98,21 +98,15 @@ def generate_random_numbers(n_sims, random_seed, n_workers):
     by the number of workers, so some workers may get an additional simulation (remainder)
     to ensure all simulations are utilized.
     """
-    # Divide the task among worker processes
     sims_per_worker = n_sims // n_workers
     remainder = n_sims % n_workers
 
-    # Create a multiprocessing queue to collect results from workers
     result_queue = multiprocessing.Queue()
-
-    # Create a list to hold references to worker processes
     processes = []
 
-    # simulating the workers
     for worker_id in range(n_workers):
         worker_sims = sims_per_worker
 
-        # handling the remainder simulations
         if remainder:
             worker_sims += 1
             remainder -= 1
