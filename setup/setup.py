@@ -38,10 +38,9 @@ def lambda_handler(event, context=None):
     """
     try:
         input_data = json.loads(event)
+
         # Validate JSON
         is_valid, errors = validate_json(input_data, SCHEMA)
-
-        # Validate if number of workers and number of simulations are positive
         if not is_valid:
             return {
                 'statusCode': 400,
