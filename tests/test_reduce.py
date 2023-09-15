@@ -19,7 +19,5 @@ class TestLambdaHandler(unittest.TestCase):
         reduce_response_stats = json.loads(reduce_response.get("body")).get("statistics")
         self.assertEqual(reduce_response['statusCode'], 200)
 
-        # example tests
         self.assertIn("Worker 2 Statistics", reduce_response_stats)
         self.assertEqual(reduce_response_stats.get("Maximum"), 0.9560342718892494)
-

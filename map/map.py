@@ -3,7 +3,6 @@ import multiprocessing
 import random
 
 
-
 def lambda_handler(event, context=None):
     """
     Handle an AWS Lambda function event by generating random numbers based on input parameters.
